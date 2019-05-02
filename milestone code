@@ -1,0 +1,158 @@
+
+import numpy as np
+from random import shuffle
+from PIL import Image
+import matplotlib.pyplot as plt
+from keras.utils import to_categorical
+import matplotlib.pyplot as plt
+
+
+filename = 'cropped_data0.csv'
+
+#Converts a JPG image to an array
+def jpg_image_to_array(image_path):
+  """
+  Loads JPEG image into 3D Numpy array of shape 
+  (width, height, channels)
+  """
+  with Image.open(image_path) as image:         
+    im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+    im_arr = im_arr.reshape((image.size[1], image.size[0], 3))                                   
+  return im_arr
+
+#Used to unroll a List of List into a single List
+def unroll2(images, values):
+    flat_list = []
+    y_list = []
+    i = 0
+    for sublist in images:
+        for item in sublist:
+            flat_list.append(item)
+            y_list.append(values[i])
+        i = i + 1
+    return flat_list, y_list
+
+#Gets the first element in a list thats in a list
+def getFirstElement(array):
+    xdata = []
+    
+    for file in array:
+        xdata.append(file[0])
+    
+    return xdata
+
+#Converts and RGB array into a grayscale Array
+def rgb2gray(rgb):
+
+    r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+
+    return gray
+
+#######################################################################
+#Imports the CSV and separates the feature data from the labels
+import csv
+ 
+image_path = []
+value = []
+ 
+with open(filename) as csvDataFile:
+    csvReader = csv.reader(csvDataFile)
+    for row in csvReader:
+        image_path.append(row[0])
+        value.append(row[1])
+
+del image_path[0]
+del value[0]
+#######################################################################
+#Seperates the feature data because there are multiple images in each entry
+filepath_array = []        
+for string in range(len(image_path)):
+    removedComma = image_path[string].replace(",","")
+    removeasf = removedComma.replace(".asf","")
+    text = removeasf.split("./")
+    del text[0]
+    filepath_array.append(text)
+    
+#######################################################################
+#Removes any entry that has no path to a picture
+imagefile_path = []
+labels = []
+for index in range(len(image_path)):
+    if image_path[index]:
+        imagefile_path.append(filepath_array[index])
+        labels.append(value[index])
+
+#
+xdata, ydata = unroll2(imagefile_path, labels)
+        
+#######################################################################
+#Selects 1 data point for each label
+#Takes the first 1000 data points
+#xdata = getFirstElement(imagefile_path)
+
+#xdata = xdata[0:716]
+#ydata = labels[0:172]
+
+
+#######################################################################
+#Converts the image into greyscale
+images = []
+for index in range(len(xdata)):
+    rgb = jpg_image_to_array(xdata[index])
+#    grey = rgb2gray(rgb) #Uncomment and change variable for grayscale
+#    grey = grey.reshape(25, 25, 1)
+    images.append(rgb)
+images = np.asarray(images)
+ydata = np.asarray(ydata)
+#######################################################################
+
+ydata = np.array(ydata)
+ydata = to_categorical(ydata)
+
+
+x_train = images[0:700]
+x_test = images[701:999]
+y_train = ydata[0:700]
+y_test = ydata[701:999]
+
+#x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
+#x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+input_shape = (5, 7, 3)
+# Making sure that the values are float so that we can get decimal points after division
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+# Normalizing the RGB codes by dividing it to the max RGB value.
+x_train /= 255
+x_test /= 255
+print('x_train shape:', x_train.shape)
+print('Number of images in x_train', x_train.shape[0])
+print('Number of images in x_test', x_test.shape[0])
+
+######################################################################
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
+import tensorflow as tf
+# Creating a Sequential Model and adding the layers
+model = Sequential()
+model.add(Conv2D(25, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(y_onehot.shape[1],activation=tf.nn.softmax))
+
+
+############################################################################
+model.compile(optimizer='adam', 
+              loss='categorical_crossentropy', 
+              metrics=['accuracy'])
+history = model.fit(x=x_train,y=y_train, epochs=15)
+
+
+
+##########################################################################
+#model.evaluate(x_test, y_test)
+print('Test Module Evaluate', model.evaluate(x_test,y_test))
+model.summary()
