@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May  2 10:51:25 2019
+
+@author: msorc
+"""
+
+import numpy as np
+from random import shuffle
+from PIL import Image
+import matplotlib.pyplot as plt
+from keras.utils import to_categorical
+import matplotlib.pyplot as plt
+
+filename = 'cropped_data0.csv'
+
+
+#######################################################################
+#Imports the CSV and separates the feature data from the labels
+import csv
+ 
+image_path = []
+value = []
+ 
+with open(filename) as csvDataFile:
+    csvReader = csv.reader(csvDataFile)
+    for row in csvReader:
+        image_path.append(row[0])
+        value.append(row[1])
+
+del image_path[0]
+del value[0]
+
+images = []
+for index in range(len(xdata)):
+    rgb = jpg_image_to_array(xdata[index])
+#    grey = rgb2gray(rgb) #Uncomment and change variable for grayscale
+#    grey = grey.reshape(25, 25, 1)
+    images.append(rgb)
+images = np.asarray(images)
+ydata = np.asarray(ydata)
