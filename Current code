@@ -50,3 +50,49 @@ for index in range(len(xdata)):
     images.append(rgb)
 images = np.asarray(images)
 ydata = np.asarray(ydata)
+
+x_train = images[0:2000]
+x_test = images[2001:2993]
+y_train = ydata[0:2000]
+y_test = ydata[2001:2993]
+
+#x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
+#x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+input_shape = (7, 5, 3)
+# Making sure that the values are float so that we can get decimal points after division
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+# Normalizing the RGB codes by dividing it to the max RGB value.
+x_train /= 255
+x_test /= 255
+print('x_train shape:', x_train.shape)
+print('Number of images in x_train', x_train.shape[0])
+print('Number of images in x_test', x_test.shape[0])
+
+######################################################################
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
+import tensorflow as tf
+# Creating a Sequential Model and adding the layers
+model = Sequential()
+model.add(Conv2D(25, kernel_size=(3,3), input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
+model.add(Dense(128, activation=tf.nn.relu))
+model.add(Dropout(0.2))
+model.add(Dense(ydata.shape[1],activation=tf.nn.softmax))
+
+
+############################################################################
+model.compile(optimizer='adam', 
+              loss='categorical_crossentropy', 
+              metrics=['accuracy'])
+history = model.fit(x=x_train,y=y_train, epochs=15)
+
+
+
+##########################################################################
+#model.evaluate(x_test, y_test)
+print('Test Module Evaluate', model.evaluate(x_test,y_test))
+model.summary()
