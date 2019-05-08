@@ -1,5 +1,7 @@
 This folder contains the most recent model, images, dataset, and csv.
 
-The zip file contains the csv, folder of 12000 images, and a recent successful model "my_model.h"
+The zip file contains the csv, folder of 12000 images,
+and a recent successful model "my_model.h"
 
-To run this code place the latitude_Individ in the main F44R folder, which should be located in the same folder as your code
+To run this code place the latitude_Individ in the main
+F44R folder, which should be located in the same folder as your code
