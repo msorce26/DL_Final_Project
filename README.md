@@ -1,1 +1,2 @@
 # DL_Final_Project
+Currently, all the data and code for the most recent model is located in CORRECT_data_reduction. Download and extract the zip file containted in this folder for the csv with data and labels. The python labeled 'code' is what was used to train the model. The file called 'Model_Test.py' was used to test on the original dataset. The file called 'label_images.py' was used to help manually label the images by hand. 
